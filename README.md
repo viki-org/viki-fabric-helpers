@@ -4,6 +4,15 @@ viki-fabric-helpers
 A library of [Fabric](http://www.fabfile.org/) helper functions used in some
 of Viki's projects.
 
+## Installation
+
+To your `requirements.txt` file, add this line:
+
+    -e git://github.com/viki-org/viki-fabric-helpers.git#egg=viki-fabric-helpers
+
+This installs the `viki-fabric-helpers` library from the master branch of this
+git repository.
+
 Example Usage:
 
 ```python
