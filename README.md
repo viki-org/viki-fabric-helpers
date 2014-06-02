@@ -13,7 +13,7 @@ To your `requirements.txt` file, add this line:
 This installs the `viki-fabric-helpers` library from the master branch of this
 git repository.
 
-Example Usage:
+## Example Usage
 
 ```python
 import os.path
