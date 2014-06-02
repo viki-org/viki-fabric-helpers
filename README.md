@@ -30,6 +30,16 @@ copy_file_to_server_if_not_exists('users.db',
 More functions are available in the `viki/fabric/helpers.py` and
 `viki/fabric/git.py` files.
 
+## Generating documentation
+
+Install Sphinx:
+
+    pip install Sphinx
+
+Go into the `docs` folder, then run:
+
+    make html
+
 ## TODO
 
 A lot of work is needed to present more user-friendly documentation (especially
