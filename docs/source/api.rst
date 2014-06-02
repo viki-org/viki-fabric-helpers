@@ -1,7 +1,7 @@
 .. _api:
 
-Developer Interface
-===================
+viki.fabric.helpers
+-------------------
 
 .. module:: viki.fabric.helpers
 
@@ -10,3 +10,15 @@ Developer Interface
 .. autofunction:: get_home_dir
 
 .. autofunction:: download_remote_file_to_tempfile
+
+.. autofunction:: copy_file_to_server_if_not_exists
+
+.. autofunction:: is_dir
+
+.. autofunction:: update_package_manager_package_lists
+
+.. autofunction:: install_software_using_package_manager
+
+.. autofunction:: is_installed_using_package_manager
+
+.. autofunction:: setup_vundle

@@ -15,13 +15,18 @@ def run_and_get_stdout(cmdString, hostString=None, useSudo=False):
 
   Args:
     cmdString(str): Command to run
+
     hostString(str, optional): This should be passed the value of
       `env.host_string`
-    useSudo(bool, optional): If `True`, `sudo` will be used instead of `run` to
-      execute the command
+
+    useSudo(bool, optional): If `True`, `sudo` will be used instead of `run`
+      to execute the command
 
   Returns:
     list of str: List of strings from running the command
+
+  >>> run_and_get_stdout("ls")
+  ["LICENSE", "README.md", "setup.py"]
   """
   if hostString is None:
     hostString = env.host_string
@@ -52,6 +57,9 @@ def get_home_dir():
   Returns:
     str: the path to the home directory of the current host, or the string
       "$HOME"
+
+  >>> get_home_dir()
+  "/home/ubuntu"
   """
   outputList = run_and_get_stdout("echo $HOME")
   if outputList:
@@ -63,10 +71,13 @@ def get_home_dir():
 # method.
 # returns the name of the NamedTemporaryFile
 def download_remote_file_to_tempfile(remoteFileName):
-  """Downloads a file from a server to a tempfile.NamedTemporaryFile.
+  """Downloads a file from a server to a \
+  `tempfile.NamedTemporaryFile \
+  <https://docs.python.org/2/library/tempfile.html#tempfile.NamedTemporaryFile>`_.
 
-  NOTE: This function calls the `close` method on of the NamedTemporaryFile.
-  NOTE: The caller is reponsible for deleting the NamedTemporaryFile.
+  **NOTE:** This function calls the `close` method on the NamedTemporaryFile.
+
+  **NOTE:** The caller is reponsible for deleting the NamedTemporaryFile.
 
   Args:
     remoteFileName(str): name of the file on the server
@@ -74,6 +85,13 @@ def download_remote_file_to_tempfile(remoteFileName):
   Returns:
     str: name of the temporary file whose contents is the same as the file on
       the server
+
+  >>> downloadedFileName = download_remote_file_to_tempfile(
+        "/home/ubuntu/a/search.rb"
+      )
+  >>> with open(downloadedFileName, "r") as f:
+        # do some processing here...
+  >>> os.unlink(downloadedFileName) # delete the file
   """
   downloadedDotfile = tempfile.NamedTemporaryFile(delete=False)
   downloadedDotfileName = downloadedDotfile.name
@@ -84,11 +102,16 @@ def download_remote_file_to_tempfile(remoteFileName):
   return downloadedDotfileName
 
 def copy_file_to_server_if_not_exists(localFileName, serverFileName):
-  """Copies a file to the server if it does not exist on the server.
+  """Copies a file to the server if it does not exist there.
 
   Args:
     localFileName(str): local path of the file to copy to the server
+
     serverFileName(str): path on the server to copy to
+
+  >>> copy_file_to_server_if_not_exists("helpers.py",
+        os.path.join("my-repo", "helpers.py")
+      )
   """
   serverName = env.host
   if not exists(serverFileName):
@@ -103,14 +126,16 @@ def copy_file_to_server_if_not_exists(localFileName, serverFileName):
     print(blue("`{}` exists on `{}`".format(serverFileName, serverName)))
 
 def is_dir(path):
-  """
-  Checks if a given path is a directory
+  """Checks if a given path on the server is a directory.
 
   Args:
     path(str): path we wish to check
 
   Returns:
-    bool: True if the given path is a directory, False otherwise
+    bool: True if the given path on the server is a directory, False otherwise
+
+  >>> is_dir("/home/ubuntu")
+  True
   """
   with(settings(hide("everything"), warn_only=True)):
     return run("[ -d '{}' ]".format(path)).succeeded
@@ -118,6 +143,8 @@ def is_dir(path):
 def update_package_manager_package_lists():
   """Updates the package list of the package manager (currently assumed to be
   apt-get)
+
+  >>> update_package_manage_package_lists()
   """
   sudo("apt-get update")
 
@@ -128,6 +155,10 @@ def install_software_using_package_manager(softwareList):
 
   Args:
     softwareList(list of str): list of software to install
+
+  >>> install_software_using_package_manager(
+        ["vim", "openjdk-6-jdk", "unzip"]
+      )
   """
   softwareToInstall = [software for software in softwareList if
     not is_installed_using_package_manager(software)]
@@ -145,6 +176,9 @@ def is_installed_using_package_manager(software):
   Return:
     bool: Returns True if the software is installed on the system using the
       package manager, False otherwise
+
+  >>> is_installed_using_package_manager("python")
+  True
   """
   outputList = run_and_get_stdout("dpkg -s {}".format(software))
   statusPrefix = "Status: "
@@ -163,6 +197,8 @@ def setup_vundle(homeDir=None):
     homeDir(str, optional): home directory for the server. If not supplied or if
       `None` is supplied, the return value of the `get_home_dir` function is
       used
+
+  >>> setup-vundle()
   """
   if homeDir is None:
     homeDir = get_home_dir()
