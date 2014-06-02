@@ -22,3 +22,18 @@ viki.fabric.helpers
 .. autofunction:: is_installed_using_package_manager
 
 .. autofunction:: setup_vundle
+
+viki.fabric.git
+---------------
+
+.. module:: viki.fabric.git
+
+.. autofunction:: initialize
+
+.. autofunction:: is_dir_under_git_control
+
+.. autofunction:: setup_server_for_git_clone
+
+.. autofunction:: is_fabtask_setup_server_for_git_clone_run
+
+.. autofunction:: get_git_ssh_script_path

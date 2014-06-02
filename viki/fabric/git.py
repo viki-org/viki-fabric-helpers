@@ -44,6 +44,8 @@ def initialize(yamlConfigFile):
   Args:
     yamlConfigFile(str): path to the YAML configuration file to read the
       configuration from.
+
+  >>> initialize("fabric_git.yaml")
   """
   with open(yamlConfigFile, "r") as f:
     yamlConfig = yaml.load(f.read())
@@ -67,6 +69,9 @@ def is_dir_under_git_control(dirName):
   Returns:
     bool: True if the directory on the server is under Git control, False
       otherwise.
+
+  >>> is_dir_under_git_control("/home/ubuntu/viki-fabric-helpers")
+  True
   """
   gitRevParseCmd = "cd {} && git rev-parse --git-dir".format(dirName)
   with settings(hide("warnings", "stdout", "stderr"), warn_only=True):
@@ -81,6 +86,26 @@ def setup_server_for_git_clone(homeDir=None):
     homeDir(str, optional): home directory for the server. If not supplied or if
       `None` is supplied, the return value of the `fabric_helpers.get_home_dir`
       function is used
+
+  For a Python Fabric script that imports the `viki.fabric.git` module using::
+
+      import viki.fabric.git
+
+  we can use this Fabric task from the command line, like so::
+
+      fab -H host1,host2,host3 viki.fabric.git.setup_server_for_git_clone
+
+  Alternatively, for a Python Fabric script that imports the `viki.fabric.git`
+  module using::
+
+      import viki.fabric.git as fabric_git
+
+  we can use this Fabric task from the command like, like so::
+
+      fab -H host1,host2,host3 fabric_git.setup_server_for_git_clone
+
+  This function can also be called as a normal function (hopefully from within
+  another Fabric task).
   """
   if homeDir is None:
     homeDir = fabric_helpers.get_home_dir()
@@ -120,6 +145,9 @@ def is_fabtask_setup_server_for_git_clone_run(homeDir=None, printWarnings=True):
   Returns:
     bool: True if the `setup_server_for_git_clone` Fabric task has been run for
       the current server, False otherwise.
+
+  >>> is_fabtask_setup_server_for_git_clone_run()
+  False # along with some other output before this return value
   """
   serverName = env.host
   if homeDir is None:
@@ -163,6 +191,9 @@ def get_git_ssh_script_path(homeDir=None):
 
   Returns:
     str: the path to the git ssh script
+
+  >>> get_git_ssh_script_path()
+  "/home/ubuntu/git_ssh_wrap.sh"
   """
   if homeDir is None:
     homeDir = fabric_helpers.get_home_dir()
