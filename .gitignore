@@ -3,3 +3,4 @@
 *.swo
 *.swp
 /docs/build
+/docs/venv

@@ -32,13 +32,11 @@ More functions are available in the `viki/fabric/helpers.py` and
 
 ## Generating documentation
 
-Install Sphinx:
+Execute this script:
 
-    pip install Sphinx
+    ./build_docs.sh
 
-Go into the `docs` folder, then run:
-
-    make html
+The docs will be generated at the `docs/build` folder.
 
 ## TODO
 
