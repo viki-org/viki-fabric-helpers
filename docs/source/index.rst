@@ -16,6 +16,14 @@ Installation
 
    install/
 
+Usage
+-----
+
+.. toctree::
+   :maxdepth: 2
+
+   viki-fabric-git
+
 API Documentation
 -----------------
 

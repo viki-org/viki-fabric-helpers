@@ -26,6 +26,10 @@ viki.fabric.helpers
 
 .. autofunction:: setup_vundle
 
+
+
+.. _api_viki_fabric_git:
+
 viki.fabric.git
 ---------------
 
