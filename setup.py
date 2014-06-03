@@ -5,6 +5,7 @@ setup(
   version="0.0.1",
   description="Helper functions for the Fabric library",
   author="Viki Inc.",
+  url="https://github.com/viki-org/viki-fabric-helpers",
   packages=["viki"],
   classifiers=[
     "Development Status :: 3 - Alpha",
