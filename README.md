@@ -10,13 +10,9 @@ To your `requirements.txt` file, add this line:
 
     viki-fabric-helpers
 
-Or with the version pinned:
+Or with the version pinned (replace `version-number` accordingly):
 
     viki-fabric-helpers==version-number
-
-such as:
-
-    viki-fabric-helpers==0.0.1
 
 ## Documentation
 

@@ -8,7 +8,7 @@ pip (requirements.txt)
 
 Append this line to *requirements.txt*::
 
-    viki-fabric-helpers==0.0.1
+    viki-fabric-helpers
 
 Followed by running::
 

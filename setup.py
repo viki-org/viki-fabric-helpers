@@ -1,8 +1,10 @@
 from setuptools import setup
 
+import viki.fabric
+
 setup(
   name="viki-fabric-helpers",
-  version="0.0.1",
+  version=viki.fabric.__version__,
   description="A library of Fabric helper functions",
   author="Viki Inc.",
   url="https://github.com/viki-org/viki-fabric-helpers",

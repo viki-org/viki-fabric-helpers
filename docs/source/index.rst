@@ -6,6 +6,8 @@
 viki-fabric-helpers
 ===================
 
+Release v\ |version|
+
 A collection of `Fabric`_ helper functions used in some of Viki's projects.
 
 Installation
