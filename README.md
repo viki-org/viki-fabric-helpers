@@ -18,6 +18,10 @@ such as:
 
     viki-fabric-helpers==0.0.1
 
+## Documentation
+
+http://viki-fabric-helpers.readthedocs.org/
+
 ## Example Usage
 
 ```python
