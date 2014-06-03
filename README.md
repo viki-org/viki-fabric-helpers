@@ -8,10 +8,15 @@ of Viki's projects.
 
 To your `requirements.txt` file, add this line:
 
-    -e git://github.com/viki-org/viki-fabric-helpers.git#egg=viki-fabric-helpers
+    viki-fabric-helpers
 
-This installs the `viki-fabric-helpers` library from the master branch of this
-git repository.
+Or with the version pinned:
+
+    viki-fabric-helpers==version-number
+
+such as:
+
+    viki-fabric-helpers==0.0.1
 
 ## Example Usage
 
