@@ -1,5 +1,8 @@
 .. _api:
 
+API Documentation
+=================
+
 viki.fabric.helpers
 -------------------
 
