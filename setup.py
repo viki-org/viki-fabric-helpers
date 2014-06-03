@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
   name="viki-fabric-helpers",
   version="0.0.1",
-  description="Helper functions for the Fabric library",
+  description="A library of Fabric helper functions",
   author="Viki Inc.",
   url="https://github.com/viki-org/viki-fabric-helpers",
   packages=["viki", "viki.fabric"],
