@@ -6,7 +6,7 @@ setup(
   description="Helper functions for the Fabric library",
   author="Viki Inc.",
   url="https://github.com/viki-org/viki-fabric-helpers",
-  packages=["viki"],
+  packages=["viki", "viki.fabric"],
   classifiers=[
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
