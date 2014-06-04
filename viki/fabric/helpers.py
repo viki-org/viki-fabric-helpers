@@ -229,3 +229,30 @@ def setup_vundle(homeDir=None):
   print(yellow('Installing vim plugins managed by Vundle...'))
   with settings(hide('stdout')):
     run('vim +PluginInstall +qall')
+
+def is_program_on_path(program):
+  """Determines if a program is in any folder in the PATH environment variable.
+
+  Args:
+    program(str): Name of the program
+
+  Return:
+    bool: True if the program is in some folder in the PATH environment
+      variable, False otherwise
+
+  >>> is_program_on_path("python")
+  True
+  """
+  with settings(hide("everything"), warn_only=True):
+    return run("command -v {} >/dev/null 2>&1".format(program)).succeeded
+
+def install_docker_most_recent():
+  """Installs the most recent version of  docker (https://www.docker.io) using
+  the http://get.docker.io shell script, and adds the current user to the
+  docker group.
+
+  **NOTE:** This function assumes that the bash shell exists, and that the
+    user has sudo privileges.
+  """
+  run("wget -qO- https://get.docker.io/ | bash")
+  sudo("usermod -aG docker {}".format(env.user))

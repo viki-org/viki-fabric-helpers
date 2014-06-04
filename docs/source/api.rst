@@ -26,6 +26,10 @@ viki.fabric.helpers
 
 .. autofunction:: setup_vundle
 
+.. autofunction:: is_program_on_path
+
+.. autofunction:: install_docker_most_recent
+
 
 
 .. _api_viki_fabric_git:
