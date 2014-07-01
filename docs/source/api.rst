@@ -8,6 +8,8 @@ viki.fabric.helpers
 
 .. module:: viki.fabric.helpers
 
+.. autofunction:: run_and_get_output
+
 .. autofunction:: run_and_get_stdout
 
 .. autofunction:: get_home_dir

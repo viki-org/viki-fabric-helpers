@@ -5,6 +5,7 @@ from fabric.contrib.files import exists
 from fabric.operations import get, put, sudo
 from fabric.utils import abort
 
+import os
 import os.path
 import StringIO
 import tempfile
@@ -28,28 +29,73 @@ def run_and_get_stdout(cmdString, hostString=None, useSudo=False):
   >>> run_and_get_stdout("ls")
   ["LICENSE", "README.md", "setup.py"]
   """
+  return run_and_get_output(cmdString, hostString=hostString, useSudo=useSudo,
+    captureStdout=True, captureStderr=False)["stdout"]
+
+def run_and_get_output(cmdString, hostString=None, useSudo=False,
+      captureStdout=True, captureStderr=True):
+  """Runs a command and grabs its stdout and stderr, without all the Fabric
+    associated stuff and other crap (hopefully).
+
+  Args:
+    cmdString(str): Command to run
+
+    hostString(str, optional): This should be passed the value of
+      `env.host_string`
+
+    useSudo(bool, optional): If `True`, `sudo` will be used instead of `run`
+      to execute the command
+
+  Returns:
+    dict: A Dict with 2 keys:
+      "stdout": list(str) if captureStdout==True, `None` otherwise
+
+      "stderr": list(str) if captureStderr==True, `None` otherwise
+
+  >>> run_and_get_output("ls")
+  { "stdout": ["LICENSE", "README.md", "setup.py"], "stderr": [] }
+  """
+
+  # takes a StringIO object
+  def _remove_fabric_prefix(sio, prefix):
+    prefixLen = len(prefix)
+    linesList = sio.getvalue().split("\n")
+    retList = []
+    for (idx, line) in enumerate(linesList):
+      if line == delimiterLine:
+        retList = linesList[idx+1:]
+        break
+    for (idx, line) in enumerate(retList):
+      if line.startswith(prefix):
+        retList[idx] = line[prefixLen:]
+    return retList
+
   if hostString is None:
     hostString = env.host_string
+  devNull = open(os.devnull, "w")
   prefix = "[{}] out: ".format(hostString)
-  prefixLen = len(prefix)
   delimiter = "START OF run_and_get_stdout delimiter"
   delimiterLine = "{}{}".format(prefix, delimiter)
-  sio = StringIO.StringIO()
+  stdoutSIO = devNull
+  stderrSIO = devNull
+  if captureStdout:
+    stdoutSIO = StringIO.StringIO()
+  if captureStderr:
+    stderrSIO = StringIO.StringIO()
   fabricRunOp = run
   if useSudo:
     fabricRunOp = sudo
   with settings(hide("running", "status"), warn_only=True):
-    fabricRunOp("echo '{}' && {}".format(delimiter, cmdString), stdout=sio)
-  linesList = sio.getvalue().split("\n")
-  retList = []
-  for (idx, line) in enumerate(linesList):
-    if line == delimiterLine:
-      retList = linesList[idx+1:]
-      break
-  for (idx, line) in enumerate(retList):
-    if line.startswith(prefix):
-      retList[idx] = line[prefixLen:]
-  return retList
+    fabricRunOp("echo '{}' && {}".format(delimiter, cmdString),
+      stdout=stdoutSIO, stderr=stderrSIO
+    )
+  devNull.close()
+  retVal = { "stdout": None, "stderr": None }
+  if captureStdout:
+    retVal["stdout"] = _remove_fabric_prefix(stdoutSIO, prefix)
+  if captureStderr:
+    retVal["stderr"] = _remove_fabric_prefix(stderrSIO, prefix)
+  return retVal
 
 def get_home_dir():
   """Returns the home directory for the current user of a given server.
