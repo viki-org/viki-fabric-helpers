@@ -37,26 +37,29 @@ GIT_SSH_SCRIPT_LOCAL_FOLDER = None
 # `SSH_PRIVATE_KEY`
 GIT_SSH_SCRIPT_NAME = None
 
-def initialize(yamlConfigFile):
-  """Initializes globals in this module. This function should be called before
-  using any public functions defined in this module.
-
-  Args:
-    yamlConfigFile(str): path to the YAML configuration file to read the
-      configuration from.
-
-  >>> initialize("fabric_git.yaml")
+def initialize():
+  """This method should be called once before any other methods in the module
   """
-  with open(yamlConfigFile, "r") as f:
-    yamlConfig = yaml.load(f.read())
-    global SSH_PRIVATE_KEY, SSH_PUBLIC_KEY, SSH_KEYS_LOCAL_COPY_DIR, \
-           SSH_KEYS_DIR, GIT_SSH_SCRIPT_FOLDER, GIT_SSH_SCRIPT_NAME
-    SSH_PRIVATE_KEY = yamlConfig["ssh_private_key"]
-    SSH_PUBLIC_KEY = yamlConfig["ssh_public_key"]
-    SSH_KEYS_LOCAL_COPY_DIR = yamlConfig["ssh_keys_local_copy_dir"]
-    SSH_KEYS_DIR = yamlConfig["ssh_keys_dir"]
-    GIT_SSH_SCRIPT_NAME = yamlConfig["git_ssh_script_name"]
-    GIT_SSH_SCRIPT_LOCAL_FOLDER = yamlConfig["git_ssh_script_local_folder"]
+  if (not hasattr(env, "viki_fabric_config")) or \
+      "git" not in env.viki_fabric_config:
+    raise RuntimeError(
+      "For modules importing the `viki.fabric.git` module (directly or"
+      " indirectly), a `viki_fabric_config.yml` containing a `git` key"
+      " (whose value is a dict) is required at the directory where the main"
+      " Python script is run.\n"
+      "For more information, consult the documentation at"
+      " http://viki-fabric-helpers.readthedocs.org/en/latest/viki-fabric-git.html"
+    )
+  global SSH_PRIVATE_KEY, SSH_PUBLIC_KEY, SSH_KEYS_LOCAL_COPY_DIR, \
+         SSH_KEYS_DIR, GIT_SSH_SCRIPT_FOLDER, GIT_SSH_SCRIPT_NAME
+  vikiFabricGitConfig = env.viki_fabric_config["git"]
+  SSH_PRIVATE_KEY = vikiFabricGitConfig["ssh_private_key"]
+  SSH_PUBLIC_KEY = vikiFabricGitConfig["ssh_public_key"]
+  SSH_KEYS_LOCAL_COPY_DIR = vikiFabricGitConfig["ssh_keys_local_copy_dir"]
+  SSH_KEYS_DIR = vikiFabricGitConfig["ssh_keys_dir"]
+  GIT_SSH_SCRIPT_NAME = vikiFabricGitConfig["git_ssh_script_name"]
+  GIT_SSH_SCRIPT_LOCAL_FOLDER = \
+    vikiFabricGitConfig["git_ssh_script_local_folder"]
 
 # Determines if a directory is under git control
 def is_dir_under_git_control(dirName):

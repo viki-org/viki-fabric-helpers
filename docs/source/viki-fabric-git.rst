@@ -13,11 +13,21 @@ cloning) involving secret repositories and assumes the following:
 * An SSH private key is used for authentication to gain access to the secret
   repository
 
+Important Note
+--------------
+
+For scripts which import the `viki.fabric.git` module, the
+`viki.fabric.git.initialize` function must be called before any functions in the
+`viki.fabric.git` module are called.
+
 Configuration
 -------------
 
-For any code which imports the `viki.fabric.git` module, you will need to create
-a `YAML <http://www.yaml.org/>`_ file with some keys:
+Any Python script which imports the `viki.fabric.git` module directly or
+indirectly will require you to create a `YAML <http://www.yaml.org/>`_ file
+named `viki_fabric_config.yml` **at the directory where the main Python script
+is invoked.** This YAML file should contain a dict at the key `git` containing
+the following keys:
 
 **ssh_private_key**
 
@@ -67,16 +77,21 @@ Example YAML file (and what it implies)
 
 .. code-block:: yaml
 
-    ssh_private_key: "id_github_ssh_key"
-    ssh_public_key: "id_github_ssh_key.pub"
-    ssh_keys_local_copy_dir: "github-ssh-keys"
-    ssh_keys_dir: ".ssh"
-    git_ssh_script_name: "gitwrap.sh"
-    git_ssh_script_local_folder: "templates"
+    git:
+      ssh_private_key: "id_github_ssh_key"
+      ssh_public_key: "id_github_ssh_key.pub"
+      ssh_keys_local_copy_dir: "github-ssh-keys"
+      ssh_keys_dir: ".ssh"
+      git_ssh_script_name: "gitwrap.sh"
+      git_ssh_script_local_folder: "templates"
 
 Suppose that Fred, a user of our library, has a Python Fabric File located at
 `/home/fred/freds-repo/fabfile.py`, which he runs from the
-`/home/fred/freds-repo` folder. Based on the values in the YAML file:
+`/home/fred/freds-repo` folder. The above YAML file should be located at
+`/home/fred/freds-repo/viki_fabric_config.yml`.
+
+Based on the contents of the `/home/fred/freds-repo/viki_fabric_config.yml`
+file:
 
 * There should be a `/home/fred/freds-repo/github-ssh-keys` folder containing
   the `id_github_ssh_key` and `id_github_ssh_key.pub` SSH keypair.
@@ -112,7 +127,7 @@ Assume that our imaginary user Fred
 
 * has everything setup as we mentioned above
 * has his YAML file located at
-  `/home/fred/freds-repo/config/viki_fabric_git.yaml`
+  `/home/fred/freds-repo/viki_fabric_config.yml`
 * runs the `/home/fred/freds-repo/fabfile.py` file (contents right below) from
   the `/home/fred/freds-repo` folder, using this command:
 
@@ -132,11 +147,11 @@ Contents of `/home/fred/freds-repo/fabfile.py` Fabric script:
     # Fred uses SSH config
     env.use_ssh_config = True
 
-    # NOTE: The `initialize` function for the `viki.fabric.git` module must
-    #       be called once in the entire program, before the
-    #       `setup_server_for_git_clone` task is run. The argument to this
-    #       function is the path to the YAML file we described above.
-    fabric_git.initialize(os.path.join("config", "viki_fabric_git.yaml"))
+    # NOTE: Because we import the `viki.fabric.git` module, the `initialize`
+    #       function for the `viki.fabric.git` module must be called once in
+    #       the entire program, before any functions in the `viki.fabric.git`
+    #       module is run.
+    fabric_git.initialize()
 
     @task
     def freds_fabric_task():
