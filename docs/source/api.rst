@@ -3,6 +3,22 @@
 API Documentation
 =================
 
+viki.fabric.docker
+------------------
+
+.. module:: viki.fabric.docker
+
+.. autofunction:: construct_tagged_docker_image_name
+
+.. autofunction:: build_docker_image_from_git_repo
+
+.. autofunction:: push_docker_image_to_registry
+
+.. autofunction:: build_docker_image_from_git_repo_and_push_to_registry
+
+.. autofunction:: pull_docker_image_from_registry
+
+
 viki.fabric.helpers
 -------------------
 
