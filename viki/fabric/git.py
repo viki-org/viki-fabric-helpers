@@ -41,18 +41,18 @@ def initialize():
   """This method should be called once before any other methods in the module
   """
   if (not hasattr(env, "viki_fabric_config")) or \
-      "git" not in env.viki_fabric_config:
+      "viki.fabric.git" not in env.viki_fabric_config:
     raise RuntimeError(
       "For modules importing the `viki.fabric.git` module (directly or"
-      " indirectly), a `viki_fabric_config.yml` containing a `git` key"
-      " (whose value is a dict) is required at the directory where the main"
+      " indirectly), a `viki_fabric_config.yml` containing a `viki.fabric.git`"
+      " key (whose value is a dict) is required at the directory where the main"
       " Python script is run.\n"
       "For more information, consult the documentation at"
       " http://viki-fabric-helpers.readthedocs.org/en/latest/viki-fabric-git.html"
     )
   global SSH_PRIVATE_KEY, SSH_PUBLIC_KEY, SSH_KEYS_LOCAL_COPY_DIR, \
          SSH_KEYS_DIR, GIT_SSH_SCRIPT_LOCAL_FOLDER, GIT_SSH_SCRIPT_NAME
-  vikiFabricGitConfig = env.viki_fabric_config["git"]
+  vikiFabricGitConfig = env.viki_fabric_config["viki.fabric.git"]
   SSH_PRIVATE_KEY = vikiFabricGitConfig["ssh_private_key"]
   SSH_PUBLIC_KEY = vikiFabricGitConfig["ssh_public_key"]
   SSH_KEYS_LOCAL_COPY_DIR = vikiFabricGitConfig["ssh_keys_local_copy_dir"]

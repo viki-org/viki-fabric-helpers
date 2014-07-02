@@ -26,8 +26,8 @@ Configuration
 Any Python script which imports the `viki.fabric.git` module directly or
 indirectly will require you to create a `YAML <http://www.yaml.org/>`_ file
 named `viki_fabric_config.yml` **at the directory where the main Python script
-is invoked.** This YAML file should contain a dict at the key `git` containing
-the following keys:
+is invoked.** This YAML file should contain a dict at the key `viki.fabric.git`
+containing the following keys:
 
 **ssh_private_key**
 
@@ -77,7 +77,7 @@ Example YAML file (and what it implies)
 
 .. code-block:: yaml
 
-    git:
+    viki.fabric.git:
       ssh_private_key: "id_github_ssh_key"
       ssh_public_key: "id_github_ssh_key.pub"
       ssh_keys_local_copy_dir: "github-ssh-keys"
