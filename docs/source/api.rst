@@ -59,8 +59,6 @@ viki.fabric.git
 
 .. module:: viki.fabric.git
 
-.. autofunction:: initialize
-
 .. autofunction:: is_dir_under_git_control
 
 .. autofunction:: setup_server_for_git_clone
