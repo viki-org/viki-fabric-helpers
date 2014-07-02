@@ -13,13 +13,6 @@ cloning) involving secret repositories and assumes the following:
 * An SSH private key is used for authentication to gain access to the secret
   repository
 
-Important Note
---------------
-
-For scripts which import the `viki.fabric.git` module, the
-`viki.fabric.git.initialize` function must be called before any functions in the
-`viki.fabric.git` module are called.
-
 Configuration
 -------------
 
@@ -146,12 +139,6 @@ Contents of `/home/fred/freds-repo/fabfile.py` Fabric script:
 
     # Fred uses SSH config
     env.use_ssh_config = True
-
-    # NOTE: Because we import the `viki.fabric.git` module, the `initialize`
-    #       function for the `viki.fabric.git` module must be called once in
-    #       the entire program, before any functions in the `viki.fabric.git`
-    #       module is run.
-    fabric_git.initialize()
 
     @task
     def freds_fabric_task():

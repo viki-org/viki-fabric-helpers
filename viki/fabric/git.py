@@ -1,3 +1,4 @@
+import functools
 import os.path
 import yaml
 
@@ -7,6 +8,9 @@ from fabric.api import env, run, task
 from fabric.colors import red
 from fabric.context_managers import hide, settings
 from fabric.contrib.files import exists, upload_template
+
+# Whether the `initialize` function has been called
+INITIALIZED = False
 
 # Name of the ssh private key that allows us to clone private analytics Github
 # repositories
@@ -38,8 +42,14 @@ GIT_SSH_SCRIPT_LOCAL_FOLDER = None
 GIT_SSH_SCRIPT_NAME = None
 
 def initialize():
-  """This method should be called once before any other methods in the module
+  """Initializes some global variables in this module with those read from the
+  `viki_fabric_config.yml` file (and subsequently stored into
+  `env.viki_fabric_config["viki.fabric.git"]`).
   """
+  global INITIALIZED
+  if INITIALIZED:
+    return
+
   if (not hasattr(env, "viki_fabric_config")) or \
       "viki.fabric.git" not in env.viki_fabric_config:
     raise RuntimeError(
@@ -50,6 +60,7 @@ def initialize():
       "For more information, consult the documentation at"
       " http://viki-fabric-helpers.readthedocs.org/en/latest/viki-fabric-git.html"
     )
+
   global SSH_PRIVATE_KEY, SSH_PUBLIC_KEY, SSH_KEYS_LOCAL_COPY_DIR, \
          SSH_KEYS_DIR, GIT_SSH_SCRIPT_LOCAL_FOLDER, GIT_SSH_SCRIPT_NAME
   vikiFabricGitConfig = env.viki_fabric_config["viki.fabric.git"]
@@ -60,6 +71,18 @@ def initialize():
   GIT_SSH_SCRIPT_NAME = vikiFabricGitConfig["git_ssh_script_name"]
   GIT_SSH_SCRIPT_LOCAL_FOLDER = \
     vikiFabricGitConfig["git_ssh_script_local_folder"]
+
+  INITIALIZED = True
+
+def _check_initialized(f):
+  """A decorator which checks that the `initialize` function has been called;
+  if not, it calls the `initialize` function, followed by the wrapped function`.
+  """
+  @functools.wraps(f)
+  def wrapper(*args, **kwargs):
+    initialize()
+    return f(*args, **kwargs)
+  return wrapper
 
 # Determines if a directory is under git control
 def is_dir_under_git_control(dirName):
@@ -81,6 +104,7 @@ def is_dir_under_git_control(dirName):
     return run(gitRevParseCmd).succeeded
 
 @task
+@_check_initialized
 def setup_server_for_git_clone(homeDir=None):
   """Fabric task that sets up the ssh keys and a wrapper script for GIT_SSH
   to allow cloning of private Github repositories.
@@ -184,6 +208,7 @@ def is_fabtask_setup_server_for_git_clone_run(homeDir=None, printWarnings=True):
     ).format(serverName)))
   return taskHasRun
 
+@_check_initialized
 def get_git_ssh_script_path(homeDir=None):
   """Returns the path to the git ssh script
 
@@ -202,6 +227,7 @@ def get_git_ssh_script_path(homeDir=None):
     homeDir = fabric_helpers.get_home_dir()
   return os.path.join(homeDir, GIT_SSH_SCRIPT_NAME)
 
+@_check_initialized
 def _get_ssh_public_key_path(homeDir=None):
   """Returns the path to the Viki Analytics SSH public key
 
@@ -217,6 +243,7 @@ def _get_ssh_public_key_path(homeDir=None):
     homeDir = fabric_helpers.get_home_dir()
   return os.path.join(homeDir, SSH_KEYS_DIR, SSH_PUBLIC_KEY)
 
+@_check_initialized
 def _get_ssh_private_key_path(homeDir=None):
   """Returns the path to the Viki Analytics SSH private key
 
