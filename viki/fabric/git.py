@@ -9,7 +9,7 @@ from fabric.colors import red
 from fabric.context_managers import hide, settings
 from fabric.contrib.files import exists, upload_template
 
-# Whether the `initialize` function has been called
+# Whether the `_initialize` function has been called
 INITIALIZED = False
 
 # Name of the ssh private key that allows us to clone private analytics Github
@@ -41,7 +41,7 @@ GIT_SSH_SCRIPT_LOCAL_FOLDER = None
 # `SSH_PRIVATE_KEY`
 GIT_SSH_SCRIPT_NAME = None
 
-def initialize():
+def _initialize():
   """Initializes some global variables in this module with those read from the
   `viki_fabric_config.yml` file (and subsequently stored into
   `env.viki_fabric_config["viki.fabric.git"]`).
@@ -75,12 +75,12 @@ def initialize():
   INITIALIZED = True
 
 def _check_initialized(f):
-  """A decorator which checks that the `initialize` function has been called;
-  if not, it calls the `initialize` function, followed by the wrapped function`.
+  """A decorator which checks that the `_initialize` function has been called;
+  if not, it calls the `_initialize` function, followed by the wrapped function`
   """
   @functools.wraps(f)
   def wrapper(*args, **kwargs):
-    initialize()
+    _initialize()
     return f(*args, **kwargs)
   return wrapper
 
