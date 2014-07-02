@@ -302,3 +302,16 @@ def install_docker_most_recent():
   """
   run("wget -qO- https://get.docker.io/ | bash")
   sudo("usermod -aG docker {}".format(env.user))
+
+def get_return_value_from_result_of_execute_runs_once(retVal):
+  """Extracts one return value of a Fabric task decorated with
+  `fabric.decorators.run_once` and ran with `fabric.tasks.execute`; this
+  Fabric task should have the same return value for all hosts.
+
+  Args:
+    retVal(dict): The return value of
+      `fabric.tasks.execute(some_fabric_task, ...)`. `some_fabric_task`
+      should be a Fabric task that only has local operations and is
+      decorated with `fabric.decorators.runs_once`.
+  """
+  return retVal[retVal.keys()[0]]

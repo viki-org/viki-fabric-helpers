@@ -32,6 +32,8 @@ viki.fabric.helpers
 
 .. autofunction:: install_docker_most_recent
 
+.. autofunction:: get_return_value_from_result_of_execute_runs_once
+
 
 
 .. _api_viki_fabric_git:
