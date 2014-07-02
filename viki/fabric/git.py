@@ -51,7 +51,7 @@ def initialize():
       " http://viki-fabric-helpers.readthedocs.org/en/latest/viki-fabric-git.html"
     )
   global SSH_PRIVATE_KEY, SSH_PUBLIC_KEY, SSH_KEYS_LOCAL_COPY_DIR, \
-         SSH_KEYS_DIR, GIT_SSH_SCRIPT_FOLDER, GIT_SSH_SCRIPT_NAME
+         SSH_KEYS_DIR, GIT_SSH_SCRIPT_LOCAL_FOLDER, GIT_SSH_SCRIPT_NAME
   vikiFabricGitConfig = env.viki_fabric_config["git"]
   SSH_PRIVATE_KEY = vikiFabricGitConfig["ssh_private_key"]
   SSH_PUBLIC_KEY = vikiFabricGitConfig["ssh_public_key"]
