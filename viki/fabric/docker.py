@@ -7,7 +7,7 @@ import viki.fabric.helpers as viki_fab_helpers
 
 from fabric.api import env
 from fabric.colors import blue, red, yellow
-from fabric.context_managers import lcd
+from fabric.context_managers import lcd, settings
 from fabric.decorators import runs_once, task
 from fabric.operations import local, run
 from fabric.tasks import execute
@@ -158,13 +158,27 @@ def push_docker_image_to_registry(dockerImageName, dockerImageTag="latest"):
   """
   dockerTaggedImageName = construct_tagged_docker_image_name(dockerImageName,
     dockerImageTag)
-  print(yellow(
-    ("Pushing image `{}` to the Docker registry (http://index.docker.io).\n"
-     "Please login to continue.").format(dockerTaggedImageName)
+  # try running `docker push` without logging in and see if it succeeds so we
+  # can avoid running a `docker login`, because at minimum, `docker login`
+  # requires the user to press the Enter key if he/she is already logged to the
+  # Docker registry.
+  dockerPushSucceeded = False
+  dockerPushCmd = "docker push {}".format(dockerTaggedImageName)
+  print(blue(
+    ("Pushing image `{}` to the Docker registry"
+     " (http://index.docker.io)...").format(dockerTaggedImageName)
   ))
-  # login to Docker registry and push the tagged Docker image we just built
-  local("docker login")
-  local("docker push {}".format(dockerTaggedImageName))
+  with settings(warn_only=True):
+    dockerPushSucceeded = local(dockerPushCmd).succeeded
+  # `docker push` failed most probably due to login issues.
+  # Do a `docker login` followed by the `docker push`.
+  if not dockerPushSucceeded:
+    print(yellow(
+      "The previous `docker push` failed most probably due to a lack of"
+      " credentials. Running `docker login` followed by `docker push`..."
+    ))
+    local("docker login")
+    local(dockerPushCmd)
 
 @runs_once
 @task
@@ -223,9 +237,22 @@ def pull_docker_image_from_registry(dockerImageName,
   dockerTaggedImageName = construct_tagged_docker_image_name(dockerImageName,
     dockerImageTag
   )
-  print(yellow(
-    ("Pulling `{}` from the Docker registry (http://index.docker.io)\n"
-     "Please login to continue.").format(dockerTaggedImageName)
+  # try running `docker pull` without logging in and see if it succeeds so we
+  # can avoid running a `docker login`, because at minimum, `docker login`
+  # requires the user to press the Enter key if he/she is already logged to the
+  # Docker registry.
+  dockerPullSucceeded = False
+  dockerPullCmd = "docker pull {}".format(dockerTaggedImageName)
+  print(blue(
+    ("Pulling `{}` from the Docker registry"
+     " (http://index.docker.io) ...").format(dockerTaggedImageName)
   ))
-  run("docker login")
-  run("docker pull {}".format(dockerTaggedImageName))
+  with settings(warn_only=True):
+    dockerPullSucceeded = run(dockerPullCmd).succeeded
+  if not dockerPullSucceeded:
+    print(yellow(
+      "The previous `docker pull` failed most probably due to a lack of"
+      " credentials. Running `docker login` followed by `docker pull`..."
+    ))
+    run("docker login")
+    run(dockerPullCmd)
