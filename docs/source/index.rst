@@ -18,6 +18,14 @@ Installation
 
    install/
 
+Configuration
+-------------
+
+.. toctree::
+   :maxdepth: 2
+
+   configuration
+
 Usage
 -----
 
