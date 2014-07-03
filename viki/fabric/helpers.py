@@ -318,13 +318,50 @@ def get_return_value_from_result_of_execute_runs_once(retVal):
   """
   return retVal[retVal.keys()[0]]
 
+def get_in_env(keyList, default=None):
+  """Obtains the value under a series of nested keys in `fabric.api.env`; the
+  value of every key in `keyList` 9except for the final key) is expected to be a
+  dict.
+
+  Args:
+    keyList(list of str): list of keys under `fabric.api.env`
+
+    default(obj, optional): The default value to return in case a key lookup
+      fails
+
+  >>> env
+  {'liar': {'pants': {'on': 'fire'}, 'cuts': {'tree': 'leaf'}}, 'feed': {'ready': 'roll'}}
+  >>> env_get_nested_keys(["liar"])
+  {'pants': {'on': 'fire'}, 'cuts': {'tree': 'leaf'}}
+  >>> env_get_nested_keys(["liar", "cuts"])
+  {'tree': 'leaf'}
+  >>> env_get_nested_keys(["feed", "ready"])
+  'roll'
+  >>> env_get_nested_keys(["feed", "ready", "roll"])
+  None
+  >>> env_get_nested_keys(["liar", "on"])
+  None
+  >>> env_get_nested_keys(["liar", "liar", "pants", "on", "fire"])
+  None
+  >>> env_get_nested_keys(["liar", "liar", "pants", "on", "fire"], "argh")
+  'argh'
+  """
+  currentVal = env
+  for k in keyList:
+    if isinstance(currentVal, dict) and k in currentVal:
+      currentVal = currentVal[k]
+    else:
+      return default
+  return currentVal
+
 def get_in_viki_fabric_config(keyList, default=None):
-  """Returns the value under a series of nested dicts in the
-  `VIKI_FABRIC_CONFIG_KEY_NAME` of the `fabric.api.env` global.
+  """Calls `get_in_env`, but with the 0th element of the `keyList` set to
+  `VIKI_FABRIC_CONFIG_KEY_NAME`.
 
   Args:
     keyList(list of str): list of keys under the `VIKI_FABRIC_CONFIG_KEY_NAME`
-      key in `fabric.api.env`
+      key in `fabric.api.env`; **do not** include `VIKI_FABRIC_CONFIG_KEY_NAME`
+      as the 0th element of this list
 
     default(obj, optional): The default value to return in case a key lookup
       fails
@@ -344,15 +381,9 @@ def get_in_viki_fabric_config(keyList, default=None):
   >>> get_in_viki_fabric_config(["hierarchy", "pin"], "useThis")
   'useThis'
   """
-  if VIKI_FABRIC_CONFIG_KEY_NAME not in env:
-    return default
-  currentVal = env[VIKI_FABRIC_CONFIG_KEY_NAME]
-  for k in keyList:
-    if isinstance(currentVal, dict) and k in currentVal:
-      currentVal = currentVal[k]
-    else:
-      return default
-  return currentVal
+  return get_in_env([VIKI_FABRIC_CONFIG_KEY_NAME] + keyList,
+    default=default
+  )
 
 def env_has_nested_keys(keyList):
   """Determines if `fabric.api.env` has a set of nested keys; the value of each

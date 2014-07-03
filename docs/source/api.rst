@@ -50,6 +50,8 @@ viki.fabric.helpers
 
 .. autofunction:: get_return_value_from_result_of_execute_runs_once
 
+.. autofunction:: get_in_env
+
 .. autofunction:: get_in_viki_fabric_config
 
 .. autofunction:: env_has_nested_keys
