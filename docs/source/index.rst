@@ -32,6 +32,8 @@ Usage
 .. toctree::
    :maxdepth: 2
 
+   viki-fabric-docker
+
    viki-fabric-git
 
 API Documentation
