@@ -50,6 +50,8 @@ viki.fabric.helpers
 
 .. autofunction:: get_return_value_from_result_of_execute_runs_once
 
+.. autofunction:: get_in_viki_fabric_config
+
 
 
 .. _api_viki_fabric_git:

@@ -5,6 +5,8 @@ from fabric.contrib.files import exists
 from fabric.operations import get, put, sudo
 from fabric.utils import abort
 
+from viki.fabric import VIKI_FABRIC_CONFIG_KEY_NAME
+
 import os
 import os.path
 import StringIO
@@ -315,3 +317,39 @@ def get_return_value_from_result_of_execute_runs_once(retVal):
       decorated with `fabric.decorators.runs_once`.
   """
   return retVal[retVal.keys()[0]]
+
+def get_in_viki_fabric_config(keyList, default=None):
+  """Returns the value under a series of nested dicts in the
+  `VIKI_FABRIC_CONFIG_KEY_NAME` of the `fabric.api.env` global.
+
+  Args:
+    keyList(list of str): list of keys under the `VIKI_FABRIC_CONFIG_KEY_NAME`
+      key in `fabric.api.env`
+
+    default(obj, optional): The default value to return in case a key lookup
+      fails
+
+  >>> env
+  {'viki_fabric_config': {'hierarchy': {'of': 'keys', 'king': {'pin': 'ship'}}}}}
+  >>> get_in_viki_fabric_config(["hierarchy"])
+  {"of": "keys", "king": {"pin": {"ship"}}}
+  >>> get_in_viki_fabric_config(["hierarchy", "of"])
+  'keys'
+  >>> get_in_viki_fabric_config(["hierarchy", "of", "keys"])
+  None
+  >>> get_in_viki_fabric_config(["hierarchy", "notthere"])
+  None
+  >>> get_in_viki_fabric_config(["hierarchy", "pin"])
+  None
+  >>> get_in_viki_fabric_config(["hierarchy", "pin"], "useThis")
+  'useThis'
+  """
+  if VIKI_FABRIC_CONFIG_KEY_NAME not in env:
+    return default
+  currentVal = env[VIKI_FABRIC_CONFIG_KEY_NAME]
+  for k in keyList:
+    if isinstance(currentVal, dict) and k in currentVal:
+      currentVal = currentVal[k]
+    else:
+      return default
+  return currentVal
