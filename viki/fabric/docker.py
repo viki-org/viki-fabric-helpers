@@ -31,7 +31,7 @@ def construct_tagged_docker_image_name(dockerImageName, dockerImageTag=None):
 def build_docker_image_from_git_repo(gitRepository, dockerImageName,
     branch="master", runGitCryptInit=False, gitCryptKeyPath=None,
     relativeDockerfileDirInGitRepo=".", dockerImageTag=None):
-  """A _local_ task which does the following:
+  """A Fabric task which **runs locally**; it does the following:
 
   1. clones a given git repository to a local temporary directory and checks out
   the branch supplied
@@ -44,8 +44,8 @@ def build_docker_image_from_git_repo(gitRepository, dockerImageName,
   The Docker image is tagged (details are in the docstring for the
   `dockerImageTag` parameter).
 
-  NOTE: This task is only run once regardless of the number of hosts/roles you
-  supply.
+  **NOTE:** This Fabric task is only run once regardless of the number of
+  hosts/roles you supply.
 
   Args:
     gitRepository(str): The git repository to clone; this repository will be
@@ -144,8 +144,11 @@ def build_docker_image_from_git_repo(gitRepository, dockerImageName,
 @runs_once
 @task
 def push_docker_image_to_registry(dockerImageName, dockerImageTag="latest"):
-  """A _local_ task which pushes a local Docker image with a given tag to the
-  Docker registry (http://index.docker.io).
+  """A Fabric task which **runs locally**; it pushes a local Docker image with
+  a given tag to the Docker registry (http://index.docker.io).
+
+  **NOTE:** This Fabric task is only run once regardless of the number of
+  hosts/roles you supply.
 
   Args:
     dockerImageName(str): Name of the Docker image in `namespace/image` format
@@ -167,10 +170,13 @@ def push_docker_image_to_registry(dockerImageName, dockerImageTag="latest"):
 @task
 def build_docker_image_from_git_repo_and_push_to_registry(gitRepository,
     dockerImageName, **kwargs):
-  """A _local_ task which builds a Docker image from a git repository and
-  pushes it to the Docker registry (http://index.docker.io). This task runs the
-  `build_docker_image_from_git_repo` followed by the
+  """A Fabric task which **runs locally**; it builds a Docker image from a git
+  repository and pushes it to the Docker registry (http://index.docker.io).
+  This task runs the `build_docker_image_from_git_repo` task followed by the
   `push_docker_image_to_registry` task.
+
+  **NOTE:** This Fabric task is only run once regardless of the number of
+  hosts/roles you supply.
 
   Args:
     gitRepository(str): Refer to the docstring for the same parameter in
