@@ -310,6 +310,9 @@ def get_return_value_from_result_of_execute_runs_once(retVal):
   `fabric.decorators.run_once` and ran with `fabric.tasks.execute`; this
   Fabric task should have the same return value for all hosts.
 
+  Refer to the **Example Script** in :doc:`viki-fabric-docker` for an example
+  of when to use this function.
+
   Args:
     retVal(dict): The return value of
       `fabric.tasks.execute(some_fabric_task, ...)`. `some_fabric_task`
