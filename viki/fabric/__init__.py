@@ -4,7 +4,7 @@ import yaml
 
 from fabric.api import env
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 __VIKI_FABRIC_CONFIG_FILE_PATH__ = "viki_fabric_config.yml"
 
