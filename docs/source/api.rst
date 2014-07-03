@@ -52,6 +52,8 @@ viki.fabric.helpers
 
 .. autofunction:: get_in_viki_fabric_config
 
+.. autofunction:: env_has_nested_keys
+
 
 
 .. _api_viki_fabric_git:

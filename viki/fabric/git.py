@@ -9,7 +9,7 @@ from fabric.colors import red
 from fabric.context_managers import hide, settings
 from fabric.contrib.files import exists, upload_template
 from viki.fabric import VIKI_FABRIC_CONFIG_KEY_NAME
-from viki.fabric.helpers import get_in_viki_fabric_config
+from viki.fabric.helpers import env_has_nested_keys, get_in_viki_fabric_config
 
 # Whether the `_initialize` function has been called
 INITIALIZED = False
@@ -52,8 +52,7 @@ def _initialize():
   if INITIALIZED:
     return
 
-  if (not hasattr(env, VIKI_FABRIC_CONFIG_KEY_NAME)) or \
-      "viki.fabric.git" not in env[VIKI_FABRIC_CONFIG_KEY_NAME]:
+  if not env_has_nested_keys([VIKI_FABRIC_CONFIG_KEY_NAME, "viki.fabric.git"]):
     raise RuntimeError(
       "For modules importing the `viki.fabric.git` module (directly or"
       " indirectly), a `viki_fabric_config.yml` containing a `viki.fabric.git`"

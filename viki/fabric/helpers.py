@@ -353,3 +353,37 @@ def get_in_viki_fabric_config(keyList, default=None):
     else:
       return default
   return currentVal
+
+def env_has_nested_keys(keyList):
+  """Determines if `fabric.api.env` has a set of nested keys; the value of each
+  key in `keyList` (except for the final key) is expected to be a dict
+
+  Args:
+    keyList(list of str): list of keys under `env`
+
+  Returns:
+    bool: True if `fabric.api.env` contains the series of nested keys, False
+      otherwise
+
+  >>> env
+  {'whos': {'your': 'daddy', 'the': {'man': {'not': 'him'}}}}
+  >>> env_has_nested_keys(['whos'])
+  True
+  >>> env_has_nested_keys(['your'])
+  False
+  >>> env_has_nested_keys(['whos', 'your'])
+  True
+  >>> env_has_nested_keys(['whos', 'your', 'daddy'])
+  False
+  >>> env_has_nested_keys(['whos', 'the', 'man'])
+  True
+  >>> env_has_nested_keys(['whos', 'man', 'not'])
+  False
+  """
+  currentVal = env
+  for k in keyList:
+    if isinstance(currentVal, dict) and k in currentVal:
+      currentVal = currentVal[k]
+    else:
+      return False
+  return True
