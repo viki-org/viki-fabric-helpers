@@ -8,6 +8,7 @@ from fabric.api import env, run, task
 from fabric.colors import red
 from fabric.context_managers import hide, settings
 from fabric.contrib.files import exists, upload_template
+from viki.fabric import VIKI_FABRIC_CONFIG_KEY_NAME
 
 # Whether the `_initialize` function has been called
 INITIALIZED = False
@@ -50,8 +51,8 @@ def _initialize():
   if INITIALIZED:
     return
 
-  if (not hasattr(env, "viki_fabric_config")) or \
-      "viki.fabric.git" not in env.viki_fabric_config:
+  if (not hasattr(env, VIKI_FABRIC_CONFIG_KEY_NAME)) or \
+      "viki.fabric.git" not in env[VIKI_FABRIC_CONFIG_KEY_NAME]:
     raise RuntimeError(
       "For modules importing the `viki.fabric.git` module (directly or"
       " indirectly), a `viki_fabric_config.yml` containing a `viki.fabric.git`"
@@ -63,7 +64,7 @@ def _initialize():
 
   global SSH_PRIVATE_KEY, SSH_PUBLIC_KEY, SSH_KEYS_LOCAL_COPY_DIR, \
          SSH_KEYS_DIR, GIT_SSH_SCRIPT_LOCAL_FOLDER, GIT_SSH_SCRIPT_NAME
-  vikiFabricGitConfig = env.viki_fabric_config["viki.fabric.git"]
+  vikiFabricGitConfig = env[VIKI_FABRIC_CONFIG_KEY_NAME]["viki.fabric.git"]
   SSH_PRIVATE_KEY = vikiFabricGitConfig["ssh_private_key"]
   SSH_PUBLIC_KEY = vikiFabricGitConfig["ssh_public_key"]
   SSH_KEYS_LOCAL_COPY_DIR = vikiFabricGitConfig["ssh_keys_local_copy_dir"]
