@@ -277,11 +277,19 @@ def local_git_branch_exists(branch):
   """Determines if a branch exists in the current git repository on your local
   machine.
 
+  **NOTE:** The current working directory is assumed to be inside the git
+  repository of interest.
+
   Args:
     branch(str): Name of the branch
 
   Returns:
     bool: True if the given branch exists, False otherwise
+
+  >>> local_git_branch_exists("master")
+  True
+  >>> local_git_branch_exists("non_existent_branch")
+  False
   """
   with settings(warn_only=True):
     return local("git show-ref --verify --quiet refs/heads/{}".format(

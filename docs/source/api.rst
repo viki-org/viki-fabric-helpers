@@ -72,3 +72,5 @@ viki.fabric.git
 .. autofunction:: is_fabtask_setup_server_for_git_clone_run
 
 .. autofunction:: get_git_ssh_script_path
+
+.. autofunction:: local_git_branch_exists
