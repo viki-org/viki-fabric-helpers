@@ -8,6 +8,7 @@ from fabric.api import env, run, task
 from fabric.colors import red
 from fabric.context_managers import hide, settings
 from fabric.contrib.files import exists, upload_template
+from fabric.operations import local
 from viki.fabric import VIKI_FABRIC_CONFIG_KEY_NAME
 from viki.fabric.helpers import env_has_nested_keys, get_in_viki_fabric_config
 
@@ -271,3 +272,18 @@ def _get_ssh_private_key_path(homeDir=None):
   if homeDir is None:
     homeDir = fabric_helpers.get_home_dir()
   return os.path.join(homeDir, _SSH_KEYS_DIR, _SSH_PRIVATE_KEY)
+
+def local_git_branch_exists(branch):
+  """Determines if a branch exists in the current git repository on your local
+  machine.
+
+  Args:
+    branch(str): Name of the branch
+
+  Returns:
+    bool: True if the given branch exists, False otherwise
+  """
+  with settings(warn_only=True):
+    return local("git show-ref --verify --quiet refs/heads/{}".format(
+      branch
+    )).succeeded

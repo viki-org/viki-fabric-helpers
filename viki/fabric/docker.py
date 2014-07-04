@@ -1,8 +1,10 @@
 import os
+import re
 import shutil
 import sys
 import tempfile
 
+import viki.fabric.git as viki_git
 import viki.fabric.helpers as viki_fab_helpers
 
 from fabric.api import env
@@ -26,10 +28,58 @@ def construct_tagged_docker_image_name(dockerImageName, dockerImageTag=None):
   else:
     return "{}:{}".format(dockerImageName, dockerImageTag)
 
+def _add_remotes_for_local_git_repository(gitRemotes):
+  """Adds git remotes supplied to the `build_docker_image_from_git_repo` Fabric
+  task to the local git repository.
+
+  **NOTE:** It is assumed that you are already in the git repository's directory
+
+  Args:
+    gitRemotes(dict): A dict where keys are git remote names and values are git
+      remote urls. Refer to the docstring for the parameter of the same name in
+      the `build_docker_image_from_git_repo` function for more information
+  """
+  with settings(warn_only=True):
+    for (gitRemoteName, gitRemoteUrl) in gitRemotes.items():
+      # we remove any existing git remote of the same name before adding the
+      # remote
+      local("git remote rm {}".format(gitRemoteName))
+      local("git remote add {} {}".format(gitRemoteName, gitRemoteUrl))
+
+def _set_upstream_branches_for_local_git_repository(gitSetUpstream):
+  """Sets the upstream branch (remote tracking branch) for the given branches
+  in the local git repository. This function should only be called by the
+  `build_docker_image_from_git_repo` Fabric task.
+
+  **NOTE:** It is assumed that you are already in the git repository's
+  directory, and that any remotes involved have been fetched.
+
+  Args:
+    gitSetUpstream(dict): A dict where keys are local branch names and values
+      are git remote branch names in `remote/branch` format.
+      Refer to docstring for the parameter of the same name in the
+      `build_docker_image_from_git_repo` Fabric task for more information.
+  """
+  with settings(warn_only=True):
+    for (localBranchName, upstreamBranchName) in gitSetUpstream.items():
+      if viki_git.local_git_branch_exists(localBranchName):
+        # Local branch exists. Set its upstream branch to the remote tracking
+        # branch
+        local("git branch --set-upstream-to={} {}".format(
+          upstreamBranchName, localBranchName
+        ))
+      else:
+        # Local branch does not exist. Checkout from the remote branch.
+        # We assume the remote has been fetched.
+        local("git checkout -b {} {}".format(localBranchName,
+          upstreamBranchName
+        ))
+
 @runs_once
 @task
 def build_docker_image_from_git_repo(gitRepository, dockerImageName,
-    branch="master", runGitCryptInit=False, gitCryptKeyPath=None,
+    branch="master", gitRemotes=None, gitSetUpstream=None,
+    runGitCryptInit=False, gitCryptKeyPath=None,
     relativeDockerfileDirInGitRepo=".", dockerImageTag=None):
   """A Fabric task which **runs locally**; it does the following:
 
@@ -55,6 +105,38 @@ def build_docker_image_from_git_repo(gitRepository, dockerImageName,
 
     branch(str, optional): The git branch of this repository we wish to build
       the Docker image from
+
+    gitRemotes(dict, optional): A dict where keys are git remote names and
+      values are git remote urls. If supplied, the remotes listed in this dict
+      will override any git remote of the same name in the cloned git
+      repository used to build the Docker image. You should supply this
+      parameter if the following hold:
+      1. the `gitRepository` parameter is a path to a git repository on your
+         local filesystem (the cloned repository's `origin` remote points to
+         the git repository on your local filesystem)
+      2. the Dockerfile adds the cloned git repository
+      3. when the built Docker image is run, it fetches from the `origin`
+         remote (which is on your local filesystem and hence the `origin` remote
+         will not be found, resulting in an error)
+
+    gitSetUpstream(dict, optional): A dict where keys are local branch names
+      and values are the upstream branch / remote tracking branch. If you've
+      supplied the `gitRemotes` parameter, you should supply this as well.
+      If supplied, `git branch --set-upstream-to=value key` will be run for each
+      key-value pair in the dict to set up remote tracking branches.
+      Remote tracking branches must be specified in `remote/branch` format.
+      You should supply this parameter if the following hold:
+      1. You supplied the `gitRemotes` parameter. This means that you are using
+         a git repository on your local filesystem for the `gitRepository`
+         parameter.
+      2. A `git pull` is run when the built Docker image is run. Suppose the
+         branch being checked out in git repository inside the Docker is the
+         `master` branch, and that your intention is to fetch updates from the
+         `origin` remote and merge them into the `master` branch. Then you
+         should supply a `{'master': 'origin/master'}` dict for this
+         `gitSetUpstream` parameter so that the upstream branch / remote
+         tracking branch of the `master` branch will be set to the
+         `origin/master` branch (otherwise the `git pull` command will fail).
 
     runGitCryptInit(bool, optional): If `True`, runs `git-crypt init` using
       the key specified by the `gitCryptKeyPath` parameter
@@ -107,6 +189,16 @@ def build_docker_image_from_git_repo(gitRepository, dockerImageName,
   dockerImageTag = None
   # go into the cloned repo
   with lcd(tmpGitRepoPathName):
+    if isinstance(gitRemotes, dict):
+      print(blue("Adding supplied git remotes..."))
+      _add_remotes_for_local_git_repository(gitRemotes)
+    # pull from all remotes
+    local("git fetch --all")
+    # set upstream branches; refer to the docstring for the `gitSetUpstream`
+    # parameter for more information
+    if isinstance(gitSetUpstream, dict):
+      print(blue("Setting upstream branches..."))
+      _set_upstream_branches_for_local_git_repository(gitSetUpstream)
     # check out the branch, set up git-crypt to decrypt the encrypted files (if
     # instructed).
     local("git checkout {}".format(branch))
