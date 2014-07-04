@@ -1,5 +1,4 @@
 import os
-import re
 import shutil
 import sys
 import tempfile
@@ -122,8 +121,10 @@ def build_docker_image_from_git_repo(gitRepository, dockerImageName,
     gitSetUpstream(dict, optional): A dict where keys are local branch names
       and values are the upstream branch / remote tracking branch. If you've
       supplied the `gitRemotes` parameter, you should supply this as well.
-      If supplied, `git branch --set-upstream-to=value key` will be run for each
-      key-value pair in the dict to set up remote tracking branches.
+      If supplied, the corresponding upstream branch will be set for the local
+      branch using `git branch --set-upstream-to=upstream-branch local-branch`
+      for existing local branches, or
+      `git checkout -b upstream-branch local-branch` for non-existent branches.
       Remote tracking branches must be specified in `remote/branch` format.
       You should supply this parameter if the following hold:
       1. You supplied the `gitRemotes` parameter. This means that you are using
