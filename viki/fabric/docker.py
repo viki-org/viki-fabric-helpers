@@ -109,29 +109,41 @@ def build_docker_image_from_git_repo(gitRepository, dockerImageName,
       values are git remote urls. If supplied, the remotes listed in this dict
       will override any git remote of the same name in the cloned git
       repository used to build the Docker image. You should supply this
-      parameter if the following hold:
+      parameter if all the following hold:
+
       1. the `gitRepository` parameter is a path to a git repository on your
          local filesystem (the cloned repository's `origin` remote points to
          the git repository on your local filesystem)
       2. the Dockerfile adds the cloned git repository
-      3. when the built Docker image is run, it fetches from the `origin`
-         remote (which is on your local filesystem and hence the `origin` remote
-         will not be found, resulting in an error)
+      3. when the built Docker image is run, it invokes git to fetch / pull /
+         perform some remote operation from the `origin` remote, which is the
+         git repository on your local filesystem that the current git
+         repository is cloned from.
+         That repository most likely does not exist in Docker, hence the fetch /
+         pull / other remote op fails.
 
     gitSetUpstream(dict, optional): A dict where keys are local branch names
-      and values are the upstream branch / remote tracking branch. If you've
-      supplied the `gitRemotes` parameter, you should supply this as well.
+      and values are the upstream branch / remote tracking branch.
+
+      If you've supplied the `gitRemotes` parameter, you should supply this as
+      well and add the local branch of interest as a key and its desired remote
+      tracking branch as the corresponding value.
+
       If supplied, the corresponding upstream branch will be set for the local
       branch using `git branch --set-upstream-to=upstream-branch local-branch`
       for existing local branches, or
       `git checkout -b upstream-branch local-branch` for non-existent branches.
+
       Remote tracking branches must be specified in `remote/branch` format.
       You should supply this parameter if the following hold:
+
       1. You supplied the `gitRemotes` parameter. This means that you are using
          a git repository on your local filesystem for the `gitRepository`
          parameter.
-      2. A `git pull` is run when the built Docker image is run. Suppose the
-         branch being checked out in git repository inside the Docker is the
+      2. A git remote operation such as fetch / pull is run when the built
+         Docker image is run.
+
+         Suppose the branch being checked out in git repository inside the Docker is the
          `master` branch, and that your intention is to fetch updates from the
          `origin` remote and merge them into the `master` branch. Then you
          should supply a `{'master': 'origin/master'}` dict for this
